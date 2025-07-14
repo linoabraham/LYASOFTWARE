@@ -1,4 +1,3 @@
-// src/main/java/com/tienda/virtual/security/SecurityConfig.java
 package com.tienda.virtual.security;
 
 
@@ -14,14 +13,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
-@EnableMethodSecurity // Habilita la seguridad basada en anotaciones como @PreAuthorize, @PostAuthorize, etc.
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;
-    private final JwtUtils jwtUtils; // Inyectamos JwtUtils para el filtro JWT
+    private final JwtUtils jwtUtils;
 
     public SecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler, JwtUtils jwtUtils) {
         this.userDetailsService = userDetailsService;
@@ -31,19 +36,16 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthTokenFilter authenticationJwtTokenFilter() {
-        // El filtro JWT necesita JwtUtils para validar tokens y UserDetailsService para cargar detalles del usuario
         return new JwtAuthTokenFilter(jwtUtils, userDetailsService);
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // BCrypt es un algoritmo de hash de contraseñas fuerte y recomendado para producción
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        // Configura el proveedor de autenticación con nuestro UserDetailsService y PasswordEncoder
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
@@ -52,20 +54,40 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        // Expone el AuthenticationManager para ser inyectado en servicios (ej. UsuarioService para login)
         return authConfig.getAuthenticationManager();
     }
 
+    // ✅ PASO 1: AÑADE ESTE BEAN PARA CONFIGURAR CORS
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Permite peticiones de cualquier origen. Para producción, es mejor restringirlo.
+        configuration.setAllowedOrigins(List.of("*"));
+        // Permite los métodos HTTP más comunes.
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        // Permite todos los headers.
+        configuration.setAllowedHeaders(List.of("*"));
+        // Permite que las credenciales (como cookies o tokens) sean enviadas.
+        configuration.setAllowCredentials(false); //Poner en false cuando los origines son "*"
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Aplica esta configuración a todas las rutas.
+        return source;
+    }
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // Deshabilita CSRF para APIs REST stateless (sin estado) que usan JWT
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler)) // Maneja errores de autenticación (ej. 401 Unauthorized)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No usa sesiones HTTP; cada petición JWT es independiente
+        // ✅ PASO 2: APLICA LA CONFIGURACIÓN DE CORS A LA CADENA DE FILTROS
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+        http.csrf(csrf -> csrf.disable())
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Permite acceso público a /auth/*
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger
-                        .requestMatchers("/health").permitAll() // <--- ✅ ESTO FALTABA
-                        .anyRequest().authenticated() // El resto necesita JWT
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/health").permitAll()
+                        .anyRequest().authenticated()
                 );
 
         http.authenticationProvider(authenticationProvider());

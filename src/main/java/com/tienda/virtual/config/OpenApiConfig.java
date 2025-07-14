@@ -33,8 +33,8 @@ public class OpenApiConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
                         ))
-                .servers(List.of(
-                        new Server().url("https://smart-meridith-consultingrl-f43089a8.koyeb.app"),
+                .servers(List.of( // <-- Ahora Java sabrá qué es 'List'
+                        new Server().url("https://smart-meridith-consultingrl-f43089a8.koyeb.app"), // <-- y qué es 'Server'
                         new Server().url("http://localhost:8080")
 
                 ));
