@@ -34,7 +34,7 @@ public class OpenApiConfig {
                                         .bearerFormat("JWT")
                         ))
                 .servers(List.of( // <-- Ahora Java sabrá qué es 'List'
-                        new Server().url("https://smart-meridith-consultingrl-f43089a8.koyeb.app"), // <-- y qué es 'Server'
+                        new Server().url("https://smart-meridith-consultingrl-f43089a8.koyeb.app"), // <-- y dué es 'Server'
                         new Server().url("http://localhost:8080")
 
                 ));

@@ -14,6 +14,6 @@ public enum FrameworkProgramacion {
     FLUTTER,     // Dart
     REACT_NATIVE, // JavaScript (for mobile)
     ANDROID,     // Kotlin/Java (native mobile)
-    IOS,         // Swift/Objective-C (native mobile)
+    IOS,         // Swift/Objeccctive-C (native mobile)
     OTRO
 }

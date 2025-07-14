@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Embeddable // Indica que esta clase puede ser embebida en otras entidades
 @Data
 @NoArgsConstructor
-@AllArgsConstructor // Útil para constructores cuando mapeas desde DTOs o en pruebas
+@AllArgsConstructor // Útil para constructores cuando dmapeas desde DTOs o en pruebas
 public class DetallesServicio {
 
     @Column(nullable = true) // Puede ser nulo si no aplica

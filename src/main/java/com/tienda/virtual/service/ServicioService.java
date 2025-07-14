@@ -84,7 +84,7 @@ public class ServicioService {
         // Mapear los detalles del DTO al modelo embebido
         if (request.getDetalles() != null) {
             // Reutiliza o crea una nueva instancia de DetallesServicio
-            // Si el servicio ya tenía detalles, actualiza sus campos; si no, crea uno nuevo.
+            // Si el servicio ya tenía detalles, actualizda sus campos; si no, crea uno nuevo.
             if (servicio.getDetalles() == null) {
                 servicio.setDetalles(new DetallesServicio());
             }

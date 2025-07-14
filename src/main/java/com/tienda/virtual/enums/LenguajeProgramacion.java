@@ -14,6 +14,5 @@ public enum LenguajeProgramacion {
     DART,
     C,
     CPP,
-    // Puedes añadir más lenguajes según necesites
     OTRO
 }

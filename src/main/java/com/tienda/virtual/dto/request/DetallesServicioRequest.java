@@ -13,7 +13,7 @@ public class DetallesServicioRequest {
     @Size(max = 100, message = "El tipo de software no puede exceder 100 caracteres")
     private String tipoDeSoftware;
 
-    // Aquí no usamos @NotNull en los enums si son opcionales, solo si siempre deben venir
+    // Aquí no usamos @NotNull en los enums sdi son opcionales, solo si siempre deben venir
     private LenguajeProgramacion lenguaje;
     private FrameworkProgramacion framework;
 }

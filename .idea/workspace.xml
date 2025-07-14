@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef983f25-aee6-4ee5-83f1-fcaeb6a0a941" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/tienda/virtual/config/OpenApiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tienda/virtual/config/OpenApiConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/tienda/virtual/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tienda/virtual/security/SecurityConfig.java" afterDir="false" />
-    </list>
+    <list default="true" id="ef983f25-aee6-4ee5-83f1-fcaeb6a0a941" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -118,7 +115,7 @@
       <workItem from="1752454505011" duration="5739000" />
       <workItem from="1752461522568" duration="1910000" />
       <workItem from="1752469795122" duration="50000" />
-      <workItem from="1752470878510" duration="3086000" />
+      <workItem from="1752470878510" duration="3398000" />
     </task>
     <servers />
   </component>
