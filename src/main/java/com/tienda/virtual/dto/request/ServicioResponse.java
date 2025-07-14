@@ -17,4 +17,11 @@ public class ServicioResponse {
     private int tiempoEsperaMinutos;
     private LocalDateTime fechaCreacion;
     private String imgUrl;
+    private String enlace; // Nueva variable: Enlace
+
+    // DTO anidado para los detalles
+    private DetallesServicioResponse detalles; // Nueva variable: Detalles anidados
+
+    // Opcional: si quieres un constructor o método estático para mapear desde la entidad
+    // public static ServicioResponse fromEntity(Servicio servicio) { ... }
 }

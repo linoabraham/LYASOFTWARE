@@ -1,6 +1,7 @@
 // src/main/java/com/tienda/virtual/dto/request/ServicioRequest.java
 package com.tienda.virtual.dto.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,4 +32,9 @@ public class ServicioRequest {
     private Integer tiempoEsperaMinutos;
     // ¡Nueva variable para la URL de la imagen!
     private String imgUrl; // No es @NotBlank si es opcional en la BD
+    @Size(max = 2048, message = "El enlace no puede exceder 2048 caracteres")
+    private String enlace; // Nueva variable: Enlace
+
+    @Valid // Valida los campos dentro de DetallesServicioRequest
+    private DetallesServicioRequest detalles; // Nueva variable: Detalles anidados
 }

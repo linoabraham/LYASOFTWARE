@@ -40,4 +40,9 @@ public class Servicio {
     private LocalDateTime fechaCreacion;
     @Column(nullable = true, length = 1024) // Campo para la URL de la imagen. Puede ser nulo.
     private String imgUrl; // ¡Nueva variable para la URL de la imagen!
+    @Column(nullable = true, length = 2048) // Nueva variable: Enlace (URL)
+    private String enlace; // Columna para almacenar un link
+
+    @Embedded // Embeds the fields from DetallesServicio into this table
+    private DetallesServicio detalles; // Nueva variable: Detalles anidados
 }

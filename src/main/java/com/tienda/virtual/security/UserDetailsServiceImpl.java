@@ -24,12 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
 
-        // Puedes crear una implementación personalizada de UserDetails si necesitas más atributos,
-        // pero para empezar, User de Spring Security es suficiente.
-        return new org.springframework.security.core.userdetails.User(
-                usuario.getEmail(),
-                usuario.getPassword(),
-                new ArrayList<>() // Aquí irían los roles/autoridades del usuario, si los usas para autorización a nivel de Spring Security
-        );
+        // Now, we use our custom builder to create CustomUserDetails
+        return CustomUserDetails.build(usuario);
     }
 }

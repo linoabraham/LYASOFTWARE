@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,30 +29,35 @@ public class OrdenController {
 
     @Operation(summary = "Crear una nueva orden (CLIENTE)")
     @PostMapping("/{usuarioId}")
+    @PreAuthorize("hasRole('CLIENTE') and #usuarioId == authentication.principal.id")
     public ResponseEntity<OrdenResponse> crearOrden(@PathVariable UUID usuarioId, @Valid @RequestBody CrearOrdenRequest request) {
         return new ResponseEntity<>(ordenService.crearOrden(usuarioId, request), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Obtener todas las órdenes de un cliente (CLIENTE)")
     @GetMapping("/mis/{usuarioId}")
+    @PreAuthorize("hasRole('CLIENTE') and #usuarioId == authentication.principal.id")
     public ResponseEntity<List<OrdenResponse>> getMisOrdenes(@PathVariable UUID usuarioId) {
         return ResponseEntity.ok(ordenService.getOrdenesByUsuario(usuarioId));
     }
 
     @Operation(summary = "Obtener todas las órdenes (ADMIN)")
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrdenResponse>> getAllOrdenes() {
         return ResponseEntity.ok(ordenService.getAllOrdenes());
     }
 
     @Operation(summary = "Actualizar el estado de una orden (ADMIN)")
     @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrdenResponse> actualizarEstadoOrden(@PathVariable UUID id, @Valid @RequestBody ActualizarEstadoOrdenRequest request) {
         return ResponseEntity.ok(ordenService.actualizarEstadoOrden(id, request));
     }
 
     @Operation(summary = "Agregar datos de entrega a una orden (ADMIN)")
     @PatchMapping("/{id}/entrega")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrdenResponse> agregarDatosEntrega(@PathVariable UUID id, @Valid @RequestBody EntregaRequest request) {
         return ResponseEntity.ok(ordenService.agregarDatosEntrega(id, request));
     }

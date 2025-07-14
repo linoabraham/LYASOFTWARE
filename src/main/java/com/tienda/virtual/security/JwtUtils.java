@@ -29,6 +29,13 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
+    /**
+     * Genera un token JWT para un usuario autenticado.
+     * El subject del token será el nombre de usuario (email) del principal.
+     *
+     * @param authentication Objeto de autenticación de Spring Security.
+     * @return El token JWT generado como String.
+     */
     public String generateJwtToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
 
@@ -40,6 +47,30 @@ public class JwtUtils {
                 .compact();
     }
 
+    /**
+     * Genera un token JWT directamente para un email de usuario.
+     * Este método es útil para escenarios donde el usuario ya ha sido creado
+     * o verificado y se necesita generar un token sin pasar por el proceso
+     * de autenticación completo de Spring Security (ej. después de la verificación de email).
+     *
+     * @param email El email del usuario para el cual se generará el token.
+     * @return El token JWT generado como String.
+     */
+    public String generateTokenForUser(String email) {
+        return Jwts.builder()
+                .setSubject(email) // El email del usuario es el subject
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    /**
+     * Extrae el nombre de usuario (subject) de un token JWT.
+     *
+     * @param token El token JWT del cual extraer el nombre de usuario.
+     * @return El nombre de usuario (email) como String.
+     */
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -49,6 +80,12 @@ public class JwtUtils {
                 .getSubject();
     }
 
+    /**
+     * Valida la integridad y validez de un token JWT.
+     *
+     * @param authToken El token JWT a validar.
+     * @return true si el token es válido, false en caso contrario.
+     */
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken);

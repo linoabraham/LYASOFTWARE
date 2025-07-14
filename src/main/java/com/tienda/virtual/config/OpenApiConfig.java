@@ -6,8 +6,11 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
@@ -21,7 +24,7 @@ public class OpenApiConfig {
                         .title("API de Tienda Virtual")
                         .version("1.0")
                         .description("Documentación de la API de la Tienda Virtual, incluyendo gestión de usuarios, servicios, órdenes y transacciones."))
-                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName)) // Aplica el esquema a todos los endpoints
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,
                                 new SecurityScheme()
@@ -29,6 +32,11 @@ public class OpenApiConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
-                        ));
+                        ))
+                .servers(List.of(
+                        new Server().url("https://smart-meridith-consultingrl-f43089a8.koyeb.app"),
+                        new Server().url("http://localhost:8080")
+
+                ));
     }
 }

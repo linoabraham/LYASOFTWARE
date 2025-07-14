@@ -1,8 +1,10 @@
 package com.tienda.virtual.service;
 
+import com.tienda.virtual.dto.request.DetallesServicioResponse;
 import com.tienda.virtual.dto.request.ServicioRequest;
 import com.tienda.virtual.dto.request.ServicioResponse;
 import com.tienda.virtual.exception.ResourceNotFoundException;
+import com.tienda.virtual.model.DetallesServicio;
 import com.tienda.virtual.model.Servicio;
 import com.tienda.virtual.repository.ServicioRepository;
 import org.springframework.stereotype.Service;
@@ -22,23 +24,21 @@ public class ServicioService {
         this.servicioRepository = servicioRepository;
     }
 
-    @Transactional(readOnly = true) // Best practice for read-only operations
+    @Transactional(readOnly = true)
     public List<ServicioResponse> getAllServicios() {
         return servicioRepository.findAll().stream()
                 .map(this::mapToServicioResponse)
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true) // Best practice for read-only operations
+    @Transactional(readOnly = true)
     public List<ServicioResponse> getActiveServicios() {
-        // Assuming you have this method in your ServicioRepository:
-        // List<Servicio> findByActivoTrue();
         return servicioRepository.findByActivoTrue().stream()
                 .map(this::mapToServicioResponse)
                 .collect(Collectors.toList());
     }
 
-    @Transactional // Ensures the save operation is atomic
+    @Transactional
     public ServicioResponse createServicio(ServicioRequest request) {
         Servicio servicio = new Servicio();
         servicio.setNombre(request.getNombre());
@@ -48,12 +48,26 @@ public class ServicioService {
         servicio.setActivo(request.getActivo());
         servicio.setTiempoEsperaMinutos(request.getTiempoEsperaMinutos());
         servicio.setFechaCreacion(LocalDateTime.now());
-        servicio.setImgUrl(request.getImgUrl()); // <-- NEW: Set the image URL
+        servicio.setImgUrl(request.getImgUrl());
+        servicio.setEnlace(request.getEnlace()); // <-- NUEVO: set enlace
+
+        // Mapear los detalles del DTO al modelo embebido
+        if (request.getDetalles() != null) {
+            servicio.setDetalles(new DetallesServicio(
+                    request.getDetalles().getRubro(),
+                    request.getDetalles().getTipoDeSoftware(),
+                    request.getDetalles().getLenguaje(),
+                    request.getDetalles().getFramework()
+            ));
+        } else {
+            servicio.setDetalles(null); // Asegurarse de que sea nulo si no se proporciona
+        }
+
         Servicio savedServicio = servicioRepository.save(servicio);
         return mapToServicioResponse(savedServicio);
     }
 
-    @Transactional // Ensures the update operation is atomic
+    @Transactional
     public ServicioResponse updateServicio(UUID id, ServicioRequest request) {
         Servicio servicio = servicioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado con ID: " + id));
@@ -64,12 +78,29 @@ public class ServicioService {
         servicio.setRequiereEntrega(request.getRequiereEntrega());
         servicio.setActivo(request.getActivo());
         servicio.setTiempoEsperaMinutos(request.getTiempoEsperaMinutos());
-        servicio.setImgUrl(request.getImgUrl()); // <-- NEW: Update the image URL
+        servicio.setImgUrl(request.getImgUrl());
+        servicio.setEnlace(request.getEnlace()); // <-- NUEVO: update enlace
+
+        // Mapear los detalles del DTO al modelo embebido
+        if (request.getDetalles() != null) {
+            // Reutiliza o crea una nueva instancia de DetallesServicio
+            // Si el servicio ya tenía detalles, actualiza sus campos; si no, crea uno nuevo.
+            if (servicio.getDetalles() == null) {
+                servicio.setDetalles(new DetallesServicio());
+            }
+            servicio.getDetalles().setRubro(request.getDetalles().getRubro());
+            servicio.getDetalles().setTipoDeSoftware(request.getDetalles().getTipoDeSoftware());
+            servicio.getDetalles().setLenguaje(request.getDetalles().getLenguaje());
+            servicio.getDetalles().setFramework(request.getDetalles().getFramework());
+        } else {
+            servicio.setDetalles(null); // Permite eliminar los detalles si se envía nulo
+        }
+
         Servicio updatedServicio = servicioRepository.save(servicio);
         return mapToServicioResponse(updatedServicio);
     }
 
-    @Transactional // Ensures the delete operation is atomic
+    @Transactional
     public void deleteServicio(UUID id) {
         if (!servicioRepository.existsById(id)) {
             throw new ResourceNotFoundException("Servicio no encontrado con ID: " + id);
@@ -77,7 +108,7 @@ public class ServicioService {
         servicioRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true) // Best practice for read-only operations
+    @Transactional(readOnly = true)
     public ServicioResponse getServicioById(UUID id) {
         Servicio servicio = servicioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado con ID: " + id));
@@ -95,7 +126,20 @@ public class ServicioService {
         response.setActivo(servicio.isActivo());
         response.setTiempoEsperaMinutos(servicio.getTiempoEsperaMinutos());
         response.setFechaCreacion(servicio.getFechaCreacion());
-        response.setImgUrl(servicio.getImgUrl()); // <-- NEW: Map the image URL
+        response.setImgUrl(servicio.getImgUrl());
+        response.setEnlace(servicio.getEnlace()); // <-- NUEVO: map enlace
+
+        // Mapear los detalles del modelo al DTO de respuesta
+        if (servicio.getDetalles() != null) {
+            DetallesServicioResponse detallesResponse = new DetallesServicioResponse();
+            detallesResponse.setRubro(servicio.getDetalles().getRubro());
+            detallesResponse.setTipoDeSoftware(servicio.getDetalles().getTipoDeSoftware());
+            detallesResponse.setLenguaje(servicio.getDetalles().getLenguaje());
+            detallesResponse.setFramework(servicio.getDetalles().getFramework());
+            response.setDetalles(detallesResponse);
+        } else {
+            response.setDetalles(null); // Asegurarse de que sea nulo si no hay detalles
+        }
         return response;
     }
 }

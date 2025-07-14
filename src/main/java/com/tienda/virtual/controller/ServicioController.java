@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class ServicioController {
 
     @Operation(summary = "Obtener todos los servicios (Clientes y Admin)")
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')") // Both roles can view services
     public ResponseEntity<List<ServicioResponse>> getAllServicios() {
         return ResponseEntity.ok(servicioService.getAllServicios());
     }
@@ -38,12 +40,14 @@ public class ServicioController {
 
     @Operation(summary = "Actualizar un servicio existente (ADMIN)")
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // Only ADMINs can update services
     public ResponseEntity<ServicioResponse> updateServicio(@PathVariable UUID id, @Valid @RequestBody ServicioRequest request) {
         return ResponseEntity.ok(servicioService.updateServicio(id, request));
     }
 
     @Operation(summary = "Eliminar un servicio (ADMIN)")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // Only ADMINs can delete services
     public ResponseEntity<Void> deleteServicio(@PathVariable UUID id) {
         servicioService.deleteServicio(id);
         return ResponseEntity.noContent().build();
@@ -51,12 +55,14 @@ public class ServicioController {
 
     @Operation(summary = "Obtener un servicio por su ID")
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')") // Both roles can view a service by ID
     public ResponseEntity<ServicioResponse> getServicioById(@PathVariable UUID id) {
         return ResponseEntity.ok(servicioService.getServicioById(id));
     }
 
     @Operation(summary = "Obtener todos los servicios activos (Clientes y Admin)")
-    @GetMapping("/activos") // <-- New endpoint for active services
+    @GetMapping("/activos")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')") // Both roles can view active services
     public ResponseEntity<List<ServicioResponse>> getActiveServicios() {
         return ResponseEntity.ok(servicioService.getActiveServicios());
     }
